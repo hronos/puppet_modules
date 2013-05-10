@@ -1,0 +1,63 @@
+** /etc/init.d/selenium-server
+#!/bin/bash
+#
+# /etc/rc.d/init.d/selenium-server
+#
+# chkconfig: 345 95 20
+# description: Starts/Stops Selenium server
+# processname: selenium-server
+#
+ 
+case "${1:-''}" in
+    'start')
+        if test -f /tmp/selenium-server.pid
+        then
+            echo "Selenium server is already running."
+        else
+        export DISPLAY=:7
+            DISPLAY=:7 java -jar /usr/local/lib/selenium-server/selenium-server-standalone-2.21.0.jar -port 4444 > /var/log/selenium-server/selenium-output.log 2> /var/log/selenium-server/selenium-error.log & echo $! > /tmp/selenium-server.pid
+            echo "Starting Selenium server..."
+ 
+            error=$?
+            if test $error -gt 0
+            then
+                echo "${bon}Error $error! Couldn't start Selenium server!${boff}"
+            echo_success
+            fi
+        fi
+    ;;
+    'stop')
+        if test -f /tmp/selenium-server.pid
+        then
+            echo "Stopping Selenium server..."
+            PID=`cat /tmp/selenium-server.pid`
+            kill -3 $PID
+            if kill -9 $PID ;
+                then
+                    sleep 2
+                    test -f /tmp/selenium-server.pid && rm -f /tmp/selenium-server.pid
+                else
+                    echo "Selenium server could not be stopped..."
+                fi
+        else
+            echo "Selenium server is not running."
+        fi
+        ;;
+    'restart')
+       if test -f /tmp/selenium-server.pid
+        then
+            kill -HUP `cat /tmp/selenium-server.pid`
+            test -f /tmp/selenium-server.pid && rm -f /tmp/selenium-server.pid
+            sleep 1
+      export DISPLAY=:7
+            DISPLAY=:7 java -jar /usr/local/lib/selenium-server/selenium-server-standalone-2.21.0.jar -port 4444 > /var/log/selenium-server/selenium-output.log 2> /var/log/selenium-server/selenium-error.log & echo $! > /tmp/selenium-server.pid
+            echo "Reload Selenium server..."
+        else
+            echo "Selenium server isn't running..."
+        fi
+        ;;
+    *)      # no parameter specified
+        echo "Usage: $SELF start|stop|restart|reload|force-reload|status"
+        exit 1
+    ;;
+esac

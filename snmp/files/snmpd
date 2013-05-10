@@ -1,0 +1,5 @@
+# WARNING! This file is managed by Puppet, all local changes will be overwritten!
+# File located at puppetmaster:/etc/puppet/modules/snmp/files/snmpd
+#################################################################################
+
+OPTIONS="-LS0-5d -Lf /dev/null -p /var/run/snmpd.pid 0.0.0.0"
